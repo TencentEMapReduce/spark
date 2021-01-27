@@ -39,6 +39,8 @@ class SparkSQLEnvSuite extends SparkFunSuite {
       "javax.jdo.option.ConnectionURL" -> jdbcUrl,
       "derby.system.durability" -> "test",
       "spark.ui.enabled" -> "false",
+      "hive.metastore.schema.verification" -> "false",
+      "datanucleus.schema.autoCreateAll" -> "true",
       QUERY_EXECUTION_LISTENERS.key -> classOf[DummyQueryExecutionListener].getCanonicalName,
       STREAMING_QUERY_LISTENERS.key -> classOf[DummyStreamingQueryListener].getCanonicalName,
       WAREHOUSE_PATH.key -> TestHiveContext.makeWarehouseDir().toURI.getPath,

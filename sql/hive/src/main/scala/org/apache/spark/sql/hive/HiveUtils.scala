@@ -347,7 +347,8 @@ private[spark] object HiveUtils extends Logging {
       conf: SparkConf,
       hadoopConf: Configuration): HiveClient = {
     val configurations = formatTimeVarsForHiveClient(hadoopConf)
-    newClientForMetadata(conf, hadoopConf, configurations)
+    newClientForMetadata(conf, hadoopConf,
+      configurations ++ Map(("hive.metastore.schema.verification", "false")))
   }
 
   protected[hive] def newClientForMetadata(

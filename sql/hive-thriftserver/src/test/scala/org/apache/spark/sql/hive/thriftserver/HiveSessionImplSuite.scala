@@ -39,11 +39,14 @@ class HiveSessionImplSuite extends SparkFunSuite {
     val sessionManager = new SessionManager(null)
     operationManager = new OperationManagerMock()
 
+    val conf = new HiveConf()
+    conf.set("hive.metastore.schema.verification", "false")
+    conf.set("datanucleus.schema.autoCreateAll", "true")
     session = new HiveSessionImpl(
       TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V1,
       "",
       "",
-      new HiveConf(),
+      conf,
       ""
     )
     session.setSessionManager(sessionManager)

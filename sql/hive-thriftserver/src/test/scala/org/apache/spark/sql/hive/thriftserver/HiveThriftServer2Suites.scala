@@ -546,7 +546,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftServer2Test {
         conf += resultSet.getString(1) -> resultSet.getString(2)
       }
 
-      assert(conf.get(HiveUtils.FAKE_HIVE_VERSION.key) === Some("2.3.7"))
+      assert(conf.get(HiveUtils.FAKE_HIVE_VERSION.key) === Some("2.1.1"))
     }
   }
 
@@ -559,7 +559,7 @@ class HiveThriftBinaryServerSuite extends HiveThriftServer2Test {
         conf += resultSet.getString(1) -> resultSet.getString(2)
       }
 
-      assert(conf.get(HiveUtils.FAKE_HIVE_VERSION.key) === Some("2.3.7"))
+      assert(conf.get(HiveUtils.FAKE_HIVE_VERSION.key) === Some("2.1.1"))
     }
   }
 
@@ -939,8 +939,10 @@ class HiveThriftBinaryServerSuite extends HiveThriftServer2Test {
 class SingleSessionSuite extends HiveThriftServer2TestBase {
   override def mode: ServerMode.Value = ServerMode.binary
 
-  override protected def extraConf: Seq[String] =
-    s"--conf ${HIVE_THRIFT_SERVER_SINGLESESSION.key}=true" :: Nil
+  override def extraConf: Seq[String] =
+    Seq(s"--conf spark.hadoop.hive.metastore.schema.verification=false",
+      "--conf spark.hadoop.datanucleus.schema.autoCreateAll=true",
+      s"--conf ${HIVE_THRIFT_SERVER_SINGLESESSION.key}=true")
 
   test("share the temporary functions across JDBC connections") {
     withMultipleConnectionJdbcStatement("test_udtf")(
@@ -1179,6 +1181,8 @@ abstract class HiveThriftServer2TestBase extends SparkFunSuite with BeforeAndAft
 
     s"""$startScript
        |  --master local
+       |  --conf spark.hadoop.hive.metastore.schema.verification=false
+       |  --conf spark.hadoop.datanucleus.schema.autoCreateAll=true
        |  --hiveconf ${ConfVars.METASTORECONNECTURLKEY}=$metastoreJdbcUri
        |  --hiveconf ${ConfVars.METASTOREWAREHOUSE}=$warehousePath
        |  --hiveconf ${ConfVars.HIVE_SERVER2_THRIFT_BIND_HOST}=localhost
@@ -1428,6 +1432,10 @@ abstract class HiveThriftServer2TestBase extends SparkFunSuite with BeforeAndAft
  * TODO: SPARK-31914: Move common tests from subclasses to this trait
  */
 abstract class HiveThriftServer2Test extends HiveThriftServer2TestBase {
+  override def extraConf: Seq[String] =
+    Seq(s"--conf spark.hadoop.hive.metastore.schema.verification=false",
+      "--conf spark.hadoop.datanucleus.schema.autoCreateAll=true")
+
   test("SPARK-17819: Support default database in connection URIs") {
     withDatabase("spark17819") { statement =>
       statement.execute(s"CREATE DATABASE IF NOT EXISTS spark17819")

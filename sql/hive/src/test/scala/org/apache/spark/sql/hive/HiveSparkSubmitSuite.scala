@@ -308,6 +308,8 @@ class HiveSparkSubmitSuite
       "--class", SPARK_18360.getClass.getName.stripSuffix("$"),
       "--name", "SPARK-18360",
       "--master", "local-cluster[2,1,1024]",
+      "--conf", "spark.hadoop.hive.metastore.schema.verification=false",
+      "--conf", "spark.hadoop.datanucleus.schema.autoCreateAll=true",
       "--conf", "spark.ui.enabled=false",
       "--conf", "spark.master.rest.enabled=false",
       "--driver-java-options", "-Dderby.system.durability=test",
@@ -324,6 +326,8 @@ class HiveSparkSubmitSuite
       "--master", "local-cluster[2,1,1024]",
       "--conf", "spark.ui.enabled=false",
       "--conf", "spark.master.rest.enabled=false",
+      "--conf", "spark.hadoop.hive.metastore.schema.verification=false",
+      "--conf", "spark.hadoop.datanucleus.schema.autoCreateAll=true",
       "--jars", HiveTestJars.getHiveContribJar().getCanonicalPath,
       unusedJar.toString)
     runSparkSubmit(argsForCreateTable)

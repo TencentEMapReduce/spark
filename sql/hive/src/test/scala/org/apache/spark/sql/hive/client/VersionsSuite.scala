@@ -71,7 +71,10 @@ class VersionsSuite extends SparkFunSuite with Logging {
   }
 
   test("success sanity check") {
-    val badClient = buildClient(HiveUtils.builtinHiveVersion, new Configuration())
+    val hadoopConf = new Configuration()
+    hadoopConf.set("hive.metastore.schema.verification", "false")
+    hadoopConf.set("datanucleus.schema.autoCreateAll", "true")
+    val badClient = buildClient(HiveUtils.builtinHiveVersion, hadoopConf)
     val db = new CatalogDatabase("default", "desc", new URI("loc"), Map())
     badClient.createDatabase(db, ignoreIfExists = true)
   }
@@ -79,12 +82,16 @@ class VersionsSuite extends SparkFunSuite with Logging {
   test("hadoop configuration preserved") {
     val hadoopConf = new Configuration()
     hadoopConf.set("test", "success")
+    hadoopConf.set("hive.metastore.schema.verification", "false")
+    hadoopConf.set("datanucleus.schema.autoCreateAll", "true")
     val client = buildClient(HiveUtils.builtinHiveVersion, hadoopConf)
     assert("success" === client.getConf("test", null))
   }
 
   test("override useless and side-effect hive configurations ") {
     val hadoopConf = new Configuration()
+    hadoopConf.set("hive.metastore.schema.verification", "false")
+    hadoopConf.set("datanucleus.schema.autoCreateAll", "true")
     // These hive flags should be reset by spark
     hadoopConf.setBoolean("hive.cbo.enable", true)
     hadoopConf.setBoolean("hive.session.history.enabled", true)

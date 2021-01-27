@@ -17,7 +17,7 @@
 
 package org.apache.spark.sql.hive.thriftserver
 
-import java.sql.{DatabaseMetaData, ResultSet, SQLFeatureNotSupportedException}
+import java.sql.{DatabaseMetaData, ResultSet, SQLException}
 
 import org.apache.hive.common.util.HiveVersionInfo
 import org.apache.hive.service.cli.HiveSQLException
@@ -28,6 +28,10 @@ import org.apache.spark.sql.types._
 import org.apache.spark.util.VersionUtils
 
 class SparkMetadataOperationSuite extends HiveThriftServer2TestBase {
+
+  override def extraConf: Seq[String] =
+    Seq(s"--conf spark.hadoop.hive.metastore.schema.verification=false",
+      "--conf spark.hadoop.datanucleus.schema.autoCreateAll=true")
 
   override def mode: ServerMode.Value = ServerMode.binary
 
@@ -517,7 +521,7 @@ class SparkMetadataOperationSuite extends HiveThriftServer2TestBase {
         () => metaData.getFunctionColumns("", "%", "%", "%"),
         () => metaData.getPseudoColumns("", "%", "%", "%"),
         () => metaData.generatedKeyAlwaysReturned).foreach { func =>
-        val e = intercept[SQLFeatureNotSupportedException](func())
+        val e = intercept[SQLException](func())
         assert(e.getMessage === "Method not supported")
       }
     }

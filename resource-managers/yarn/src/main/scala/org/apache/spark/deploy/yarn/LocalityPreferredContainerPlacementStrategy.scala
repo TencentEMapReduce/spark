@@ -139,8 +139,7 @@ private[yarn] class LocalityPreferredContainerPlacementStrategy(
         // Only filter out the ratio which is larger than 0, which means the current host can
         // still be allocated with new container request.
         val hosts = preferredLocalityRatio.filter(_._2 > 0).keys.toArray
-        val racks = resolver.resolve(hosts).map(_.getNetworkLocation)
-          .filter(_ != null).toSet
+        val racks = hosts.map(resolver.resolve).filter(_ != null).toSet
         containerLocalityPreferences += ContainerLocalityPreferences(hosts, racks.toArray)
 
         // Minus 1 each time when the host is used. When the current ratio is 0,

@@ -40,6 +40,10 @@ class UISeleniumSuite
   val uiPort = 20000 + Random.nextInt(10000)
   override def mode: ServerMode.Value = ServerMode.binary
 
+  override def extraConf: Seq[String] =
+    Seq(s"--conf spark.hadoop.hive.metastore.schema.verification=false",
+      "--conf spark.hadoop.datanucleus.schema.autoCreateAll=true")
+
   override def beforeAll(): Unit = {
     webDriver = new HtmlUnitDriver {
       getWebClient.setCssErrorHandler(new SparkUICssErrorHandler)

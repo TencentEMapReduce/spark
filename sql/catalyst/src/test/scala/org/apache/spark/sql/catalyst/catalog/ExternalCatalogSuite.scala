@@ -673,7 +673,11 @@ abstract class ExternalCatalogSuite extends SparkFunSuite with BeforeAndAfterEac
       val newPart1b = catalog.getPartition("db2", "tbl2", part1.spec)
       val newPart2b = catalog.getPartition("db2", "tbl2", part2.spec)
       assert(newPart1b.storage.serde == Some(newSerde))
-      assert(newPart2b.storage.properties == newSerdeProps)
+      newSerdeProps.foreach { case (k, v) =>
+        val newValue = newPart2b.storage.properties.get(k)
+        assert(newValue.isDefined)
+        assert(newValue.get == v)
+      }
       // alter but change spec, should fail because new partition specs do not exist yet
       val badPart1 = part1.copy(spec = Map("a" -> "v1", "b" -> "v2"))
       val badPart2 = part2.copy(spec = Map("a" -> "v3", "b" -> "v4"))

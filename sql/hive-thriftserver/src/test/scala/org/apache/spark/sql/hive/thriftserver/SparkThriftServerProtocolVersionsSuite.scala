@@ -33,6 +33,10 @@ import org.apache.spark.unsafe.types.UTF8String
 
 class SparkThriftServerProtocolVersionsSuite extends HiveThriftServer2TestBase {
 
+  override def extraConf: Seq[String] =
+    Seq(s"--conf spark.hadoop.hive.metastore.schema.verification=false",
+      "--conf spark.hadoop.datanucleus.schema.autoCreateAll=true")
+
   override def mode: ServerMode.Value = ServerMode.binary
 
   def testExecuteStatementWithProtocolVersion(

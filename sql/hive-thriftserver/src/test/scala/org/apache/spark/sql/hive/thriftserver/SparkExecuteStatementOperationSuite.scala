@@ -66,8 +66,11 @@ class SparkExecuteStatementOperationSuite extends SparkFunSuite with SharedSpark
   ).foreach { case (finalState, transition) =>
     test("SPARK-32057 SparkExecuteStatementOperation should not transiently become ERROR " +
       s"before being set to $finalState") {
+      val conf = new HiveConf
+      conf.set("hive.metastore.schema.verification", "false")
+      conf.set("datanucleus.schema.autoCreateAll", "true")
       val hiveSession = new HiveSessionImpl(TProtocolVersion.HIVE_CLI_SERVICE_PROTOCOL_V1,
-      "username", "password", new HiveConf, "ip address")
+      "username", "password", conf, "ip address")
       hiveSession.open(new util.HashMap)
 
       HiveThriftServer2.eventManager = mock(classOf[HiveThriftServer2EventManager])

@@ -25,18 +25,13 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.hadoop.hive.common.auth.HiveAuthUtils;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hadoop.hive.shims.ShimLoader;
 import org.apache.hive.service.ServiceException;
 import org.apache.hive.service.auth.HiveAuthFactory;
 import org.apache.hive.service.cli.CLIService;
-import org.apache.hive.service.cli.HiveSQLException;
-import org.apache.hive.service.rpc.thrift.TGetQueryIdReq;
-import org.apache.hive.service.rpc.thrift.TGetQueryIdResp;
 import org.apache.hive.service.server.ThreadFactoryWithGarbageCleanup;
-import org.apache.thrift.TException;
 import org.apache.thrift.TProcessorFactory;
 import org.apache.thrift.protocol.TBinaryProtocol;
 import org.apache.thrift.server.TThreadPoolServer;
@@ -69,7 +64,7 @@ public class ThriftBinaryCLIService extends ThriftCLIService {
         sslVersionBlacklist.add(sslVersion);
       }
       if (!hiveConf.getBoolVar(ConfVars.HIVE_SERVER2_USE_SSL)) {
-        serverSocket = HiveAuthUtils.getServerSocket(hiveHost, portNum);
+        serverSocket = HiveAuthFactory.getServerSocket(hiveHost, portNum);
       } else {
         String keyStorePath = hiveConf.getVar(ConfVars.HIVE_SERVER2_SSL_KEYSTORE_PATH).trim();
         if (keyStorePath.isEmpty()) {
@@ -78,7 +73,7 @@ public class ThriftBinaryCLIService extends ThriftCLIService {
         }
         String keyStorePassword = ShimLoader.getHadoopShims().getPassword(hiveConf,
             HiveConf.ConfVars.HIVE_SERVER2_SSL_KEYSTORE_PASSWORD.varname);
-        serverSocket = HiveAuthUtils.getServerSSLSocket(hiveHost, portNum, keyStorePath,
+        serverSocket = HiveAuthFactory.getServerSSLSocket(hiveHost, portNum, keyStorePath,
             keyStorePassword, sslVersionBlacklist);
       }
 
@@ -108,15 +103,6 @@ public class ThriftBinaryCLIService extends ThriftCLIService {
       LOG.info(msg);
     } catch (Exception t) {
       throw new ServiceException("Error initializing " + getName(), t);
-    }
-  }
-
-  @Override
-  public TGetQueryIdResp GetQueryId(TGetQueryIdReq req) throws TException {
-    try {
-      return new TGetQueryIdResp(cliService.getQueryId(req.getOperationHandle()));
-    } catch (HiveSQLException e) {
-      throw new TException(e);
     }
   }
 

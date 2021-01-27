@@ -26,6 +26,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.hadoop.hive.conf.HiveConf;
 import org.apache.hadoop.hive.conf.HiveConf.ConfVars;
 import org.apache.hive.service.AbstractService;
@@ -43,8 +45,6 @@ import org.apache.thrift.server.ServerContext;
 import org.apache.thrift.server.TServer;
 import org.apache.thrift.server.TServerEventHandler;
 import org.apache.thrift.transport.TTransport;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * ThriftCLIService.
@@ -52,7 +52,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class ThriftCLIService extends AbstractService implements TCLIService.Iface, Runnable {
 
-  public static final Logger LOG = LoggerFactory.getLogger(ThriftCLIService.class.getName());
+  public static final Log LOG = LogFactory.getLog(ThriftCLIService.class.getName());
 
   protected CLIService cliService;
   private static final TStatus OK_STATUS = new TStatus(TStatusCode.SUCCESS_STATUS);
@@ -260,28 +260,6 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
       resp.setStatus(HiveSQLException.toTStatus(e));
     }
     return resp;
-  }
-
-  @Override
-  public TSetClientInfoResp SetClientInfo(TSetClientInfoReq req) throws TException {
-    // TODO: We don't do anything for now, just log this for debugging.
-    //       We may be able to make use of this later, e.g. for workload management.
-    if (req.isSetConfiguration()) {
-      StringBuilder sb = null;
-      for (Map.Entry<String, String> e : req.getConfiguration().entrySet()) {
-        if (sb == null) {
-          SessionHandle sh = new SessionHandle(req.getSessionHandle());
-          sb = new StringBuilder("Client information for ").append(sh).append(": ");
-        } else {
-          sb.append(", ");
-        }
-        sb.append(e.getKey()).append(" = ").append(e.getValue());
-      }
-      if (sb != null) {
-        LOG.info("{}", sb);
-      }
-    }
-    return new TSetClientInfoResp(OK_STATUS);
   }
 
   private String getIpAddress() {
@@ -695,15 +673,6 @@ public abstract class ThriftCLIService extends AbstractService implements TCLISe
   }
 
   protected abstract void initializeServer();
-
-  @Override
-  public TGetQueryIdResp GetQueryId(TGetQueryIdReq req) throws TException {
-    try {
-      return new TGetQueryIdResp(cliService.getQueryId(req.getOperationHandle()));
-    } catch (HiveSQLException e) {
-      throw new TException(e);
-    }
-  }
 
   @Override
   public abstract void run();

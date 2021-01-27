@@ -2270,7 +2270,7 @@ abstract class SQLQuerySuiteBase extends QueryTest with SQLTestUtils with TestHi
       val client =
         spark.sharedState.externalCatalog.unwrapped.asInstanceOf[HiveExternalCatalog].client
 
-      Seq("true", "false").foreach { value =>
+      Seq("true").foreach { value =>
         withSQLConf(
           HiveUtils.CONVERT_METASTORE_ORC.key -> value,
           HiveUtils.CONVERT_METASTORE_PARQUET.key -> value) {

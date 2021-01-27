@@ -143,8 +143,7 @@ public class HiveSessionImpl implements HiveSession {
     sessionState.setIsHiveServerQuery(true);
     SessionState.start(sessionState);
     try {
-      sessionState.loadAuxJars();
-      sessionState.loadReloadableAuxJars();
+      sessionState.reloadAuxJars();
     } catch (IOException e) {
       String msg = "Failed to load reloadable jar file path: " + e;
       LOG.error(msg, e);

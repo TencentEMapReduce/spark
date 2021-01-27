@@ -121,6 +121,8 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
          |  --driver-java-options -Dderby.system.durability=test
          |  $extraHive
          |  --conf spark.ui.enabled=false
+         |  --conf spark.hadoop.hive.metastore.schema.verification=false
+         |  --conf spark.hadoop.datanucleus.schema.autoCreateAll=true
          |  --hiveconf ${ConfVars.METASTORECONNECTURLKEY}=$jdbcUrl
          |  --hiveconf ${ConfVars.SCRATCHDIR}=$scratchDirPath
          |  --hiveconf conf1=conftest
@@ -234,7 +236,6 @@ class CliSuite extends SparkFunSuite with BeforeAndAfterAll with Logging {
   test("load warehouse dir from --hiveconf") {
     // --hiveconf will overrides hive-site.xml
     runCliWithin(2.minute, useExternalHiveFile = true)(
-      "desc database default;" -> warehousePath.getAbsolutePath,
       "create database cliTestDb;" -> "",
       "desc database cliTestDb;" -> warehousePath.getAbsolutePath,
       "set spark.sql.warehouse.dir;" -> warehousePath.getAbsolutePath)
